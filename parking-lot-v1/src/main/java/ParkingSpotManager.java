@@ -21,9 +21,11 @@ public class ParkingSpotManager {
 
     private Map<SpotType, List<ParkingSpot>> parkingSpots;
     private static ParkingSpotManager instance;
+    private SpotSelectionStrategy spotSelectionStrategy;
 
     private ParkingSpotManager() {
         this.parkingSpots = new HashMap<>();
+        this.spotSelectionStrategy = new NearestSpotStrategy();
         // Initialize empty lists for each spot type
         for (SpotType type : SpotType.values()) {
             parkingSpots.put(type, new ArrayList<>());
@@ -40,6 +42,23 @@ public class ParkingSpotManager {
         }
         return instance;
     }
+    /**
+     * SET THE STRATEGY at runtime!
+     * This is the power of Strategy Pattern.
+     */
+    public void setSpotSelectionStrategy(SpotSelectionStrategy strategy) {
+        if (strategy == null) {
+            throw new IllegalArgumentException("Strategy cannot be null");
+        }
+        this.spotSelectionStrategy = strategy;
+        System.out.println("✓ Spot selection strategy changed to: " + strategy.getStrategyName());
+    }
+
+    public SpotSelectionStrategy getSpotSelectionStrategy() {
+        return spotSelectionStrategy;
+    }
+
+
 
     public Map<SpotType, List<ParkingSpot>> getParkingSpots() {
         return parkingSpots;
@@ -72,6 +91,7 @@ public class ParkingSpotManager {
         System.out.println("Parking lot initialized:");
         System.out.println("  - Two-wheeler spots: " + numTwoWheeler);
         System.out.println("  - Four-wheeler spots: " + numFourWheeler);
+        System.out.println("  - Selection strategy: " + spotSelectionStrategy.getStrategyName());
     }
 
     /**
@@ -108,14 +128,8 @@ public class ParkingSpotManager {
 
         List<ParkingSpot> spots = parkingSpots.get(spotType);
 
-        // First Available Strategy (hardcoded for now)
-        for (ParkingSpot spot : spots) {
-            if (spot.isEmpty()) {
-                return spot;
-            }
-        }
-
-        return null;  // No available spot
+       //DELEGATE TO STRATEGY
+        return spotSelectionStrategy.findSpot(spots);
     }
 
     /**
