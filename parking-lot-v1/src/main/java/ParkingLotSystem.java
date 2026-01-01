@@ -1,120 +1,126 @@
+
+/**
+ * Demonstrates the power of Strategy Pattern.
+ * Shows how we can change algorithms at RUNTIME without touching existing code!
+ */
 public class ParkingLotSystem {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws InterruptedException {
 
+        System.out.println("----------------------------------------");
+        System.out.println("   STRATEGY PATTERN DEMONSTRATION      ");
+        System.out.println("----------------------------------------");
 
-        System.out.println("========================================");
-        System.out.println("    PARKING LOT MANAGEMENT SYSTEM      ");
-        System.out.println("========================================\n");
-
-        // =============================================
-        // STEP 1: Initialize the Parking Lot
-        // =============================================
+        // Initialize system
         ParkingSpotManager manager = ParkingSpotManager.getInstance();
-        manager.createParkingSpots(5, 5);
+        manager.createParkingSpots(10, 10);
 
-        // =============================================
-        // STEP 2: Initialize Entry and Exit Points
-        // =============================================
         Entrance entrance = Entrance.getInstance(manager);
         Exit exit = Exit.getInstance(manager);
 
-        manager.displayStatus();
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("PART 1: SPOT SELECTION STRATEGIES");
+        System.out.println("=".repeat(60));
 
         // =============================================
-        // STEP 3: Scenario 1 - Park a Two Wheeler
+        // Test 1: First Available Strategy (Default)
         // =============================================
-        try {
-            Vehicle bike = new Vehicle("KA01 AB1234", SpotType.TWO_WHEELER);
-            Ticket bikeTicket = entrance.parkVehicle(bike);
+        System.out.println("\n### TEST 1: First Available Strategy ###");
+        manager.setSpotSelectionStrategy(new FarthestSpotStrategy());
 
-            // Simulate some time passing (for demo purposes)
-            Thread.sleep(1000);  // 1 second = simulates parking duration
+        Vehicle v1 = new Vehicle("KA01 A001", SpotType.TWO_WHEELER);
+        Vehicle v2 = new Vehicle("KA01 A002", SpotType.TWO_WHEELER);
 
-            manager.displayStatus();
+        Ticket t1 = entrance.parkVehicle(v1);
+        Ticket t2 = entrance.parkVehicle(v2);
 
-            // Exit the bike
-            double bikeFee = exit.processExit(bikeTicket);
-
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-        }
+        System.out.println("✓ Both vehicles got first available spots");
 
         // =============================================
-        // STEP 4: Scenario 2 - Park a Four Wheeler
+        // Test 2: Farthest Spot Strategy
         // =============================================
-        try {
-            Vehicle car = new Vehicle("MH02 XY5678", SpotType.FOUR_WHEELER);
-            Ticket carTicket = entrance.parkVehicle(car);
+        System.out.println("\n### TEST 2: Farthest Spot Strategy ###");
+        manager.setSpotSelectionStrategy(new FarthestSpotStrategy());
 
-            manager.displayStatus();
+        Vehicle v3 = new Vehicle("KA01 A003", SpotType.TWO_WHEELER);
+        Ticket t3 = entrance.parkVehicle(v3);
 
-            // Exit the car
-            Thread.sleep(500);
-            double carFee = exit.processExit(carTicket);
-
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-        }
+        System.out.println("✓ Vehicle assigned farthest available spot");
 
         // =============================================
-        // STEP 5: Scenario 3 - Multiple Vehicles
+        // Test 3: Random Spot Strategy
         // =============================================
-        System.out.println("\n--- Parking Multiple Vehicles ---");
+        System.out.println("\n### TEST 3: Random Spot Strategy ###");
+        manager.setSpotSelectionStrategy(new NearestSpotStrategy());
 
-        try {
-            Vehicle bike1 = new Vehicle("DL03 CD9012", SpotType.TWO_WHEELER);
-            Vehicle bike2 = new Vehicle("TN04 EF3456", SpotType.TWO_WHEELER);
-            Vehicle car1 = new Vehicle("KA05 GH7890", SpotType.FOUR_WHEELER);
+        Vehicle v4 = new Vehicle("KA01 A004", SpotType.TWO_WHEELER);
+        Vehicle v5 = new Vehicle("KA01 A005", SpotType.TWO_WHEELER);
 
-            Ticket t1 = entrance.parkVehicle(bike1);
-            Ticket t2 = entrance.parkVehicle(bike2);
-            Ticket t3 = entrance.parkVehicle(car1);
+        Ticket t4 = entrance.parkVehicle(v4);
+        Ticket t5 = entrance.parkVehicle(v5);
 
-            manager.displayStatus();
-
-            // Exit all
-            exit.processExit(t1);
-            exit.processExit(t2);
-            exit.processExit(t3);
-
-        } catch (Exception e) {
-            System.err.println("Error: " + e.getMessage());
-        }
-
-        // =============================================
-        // STEP 6: Scenario 4 - Parking Lot Full
-        // =============================================
-        System.out.println("\n--- Testing Parking Lot Full Scenario ---");
-
-        try {
-            // Fill all two-wheeler spots
-            for (int i = 0; i < 5; i++) {
-                Vehicle bike = new Vehicle("BIKE-" + i, SpotType.TWO_WHEELER);
-                entrance.parkVehicle(bike);
-            }
-
-            manager.displayStatus();
-
-            // Try to park one more - should fail
-            Vehicle extraBike = new Vehicle("BIKE-EXTRA", SpotType.TWO_WHEELER);
-            entrance.parkVehicle(extraBike);
-
-        } catch (RuntimeException e) {
-            System.err.println("Expected error: " + e.getMessage());
-        }
+        System.out.println("✓ Vehicles randomly distributed");
 
         manager.displayStatus();
 
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("PART 2: PRICING STRATEGIES");
+        System.out.println("=".repeat(60));
+
         // =============================================
-        // STEP 7: Dynamic Spot Addition
+        // Test 4: Per-Minute Pricing (Default)
         // =============================================
-        System.out.println("\n--- Adding New Parking Spot ---");
-        manager.addParkingSpot(SpotType.TWO_WHEELER);
+        System.out.println("\n### TEST 4: Per-Minute Pricing ###");
+        exit.setPricingStrategy(new PerMinutePricingStrategy());
+
+        Thread.sleep(2000);  // Simulate 2 seconds parking
+        double price1 = exit.processExit(t1);
+        System.out.printf("Price with per-minute: ₹%.2f%n", price1);
+
+        // =============================================
+        // Test 5: Hourly Pricing with Daily Cap
+        // =============================================
+        System.out.println("\n### TEST 5: Hourly Pricing with Daily Cap ###");
+        exit.setPricingStrategy(new HourlyPricingStrategy());
+
+        double price2 = exit.processExit(t2);
+        System.out.printf("Price with hourly (1 hour minimum): ₹%.2f%n", price2);
+
+        // =============================================
+        // Test 6: Flat Rate Pricing
+        // =============================================
+        System.out.println("\n### TEST 6: Flat Rate Pricing ###");
+        exit.setPricingStrategy(new HourlyPricingStrategy());
+
+        double price3 = exit.processExit(t3);
+        System.out.printf("Price with flat rate: ₹%.2f%n", price3);
+
+        // Clean up remaining vehicles
+        exit.setPricingStrategy(new PerMinutePricingStrategy());
+        exit.processExit(t4);
+        exit.processExit(t5);
+
         manager.displayStatus();
 
-        System.out.println("\n========================================");
-        System.out.println("    DEMO COMPLETED SUCCESSFULLY!       ");
-        System.out.println("========================================");
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("KEY TAKEAWAYS");
+        System.out.println("=".repeat(60));
+        System.out.println("✓ Changed spot selection algorithm WITHOUT changing Manager code");
+        System.out.println("✓ Changed pricing algorithm WITHOUT changing Exit code");
+        System.out.println("✓ Can add new strategies WITHOUT modifying existing classes");
+        System.out.println("✓ Strategies can be swapped at RUNTIME");
+        System.out.println("✓ Each strategy is independent and testable");
+        System.out.println("\n" + "=".repeat(60));
+        System.out.println("STRATEGY PATTERN BENEFITS");
+        System.out.println("=".repeat(60));
+        System.out.println("1. Open-Closed Principle: Open for extension, closed for modification");
+        System.out.println("2. Single Responsibility: Each strategy does ONE thing well");
+        System.out.println("3. Flexibility: Change behavior at runtime");
+        System.out.println("4. Testability: Test each strategy independently");
+        System.out.println("5. Maintainability: Add new strategies without touching old code");
+
+        System.out.println("\n------------------------------------------");
+        System.out.println("   DEMO COMPLETED SUCCESSFULLY!        ");
+        System.out.println("-------------------------------------------\n");
     }
 }

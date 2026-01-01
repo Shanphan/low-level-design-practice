@@ -54,7 +54,7 @@ public class Entrance {
         ParkingSpot availableSpot = parkingSpotManager.findAvailableSpot(vehicle.getVehicleType());
 
         if (availableSpot == null) {
-            System.out.println("❌ No parking space available for " + vehicle.getVehicleType().getDisplayName());
+            System.out.println("No parking space available for " + vehicle.getVehicleType().getDisplayName());
             throw new RuntimeException("No parking space available for " + vehicle.getVehicleType().getDisplayName());
         }
 

@@ -17,6 +17,8 @@ public class Exit {
 
     private final ParkingSpotManager parkingSpotManager;
     private static Exit instance;
+    // STRATEGY PATTERN: Pluggable pricing algorithm
+    private PricingStrategy pricingStrategy;
 
     private Exit(ParkingSpotManager parkingSpotManager) {
         if (parkingSpotManager == null) {
@@ -36,6 +38,23 @@ public class Exit {
     }
 
     /**
+     * SET THE PRICING STRATEGY at runtime!
+     * This is the power of Strategy Pattern.
+     */
+    public void setPricingStrategy(PricingStrategy strategy) {
+        if (strategy == null) {
+            throw new IllegalArgumentException("Pricing strategy cannot be null");
+        }
+        this.pricingStrategy = strategy;
+        System.out.println("✓ Pricing strategy changed to: " + strategy.getStrategyName());
+        System.out.println("  " + strategy.getDescription());
+    }
+
+    public PricingStrategy getPricingStrategy() {
+        return pricingStrategy;
+    }
+
+    /**
      * Main exit point: Process vehicle exit and calculate fee.
      * This method ORCHESTRATES the exit process.
      *
@@ -50,46 +69,19 @@ public class Exit {
         System.out.println("\n--- Vehicle Exit ---");
         System.out.println(ticket);
 
-        // Step 1: Calculate price
-        double totalPrice = calculatePrice(ticket);
+        // Step 1: Calculate price using CURRENT STRATEGY
+        LocalDateTime exitTime = LocalDateTime.now();
+        double totalPrice = pricingStrategy.calculatePrice(ticket, exitTime);
 
-        // Step 2: Ask Manager to free the spot
+        // Step 2: Display duration
+        long minutesParked = ChronoUnit.MINUTES.between(ticket.getEntryTime(), exitTime);
+        System.out.printf("Duration: %d minutes%n", minutesParked);
+        System.out.printf("Pricing: %s%n", pricingStrategy.getStrategyName());
+
+        // Step 3: Free the spot
         parkingSpotManager.freeSpot(ticket.getParkingSpot());
 
-        System.out.printf("✓ Exit processed. Total fee: ₹%.2f%n", totalPrice);
-
-        return totalPrice;
-    }
-
-    /**
-     * Calculate parking fee based on duration.
-     *
-     * Pricing logic:
-     * - Price per minute = spot's base price (from SpotType enum)
-     * - Total = minutes parked × price per minute
-     *
-     * NOTE: In real systems, you'd have more complex pricing:
-     *       - First hour free
-     *       - Hourly rates with daily caps
-     *       - Weekend vs weekday rates
-     *       Later we'll use PricingStrategy pattern for this!
-     */
-    private double calculatePrice(Ticket ticket) {
-        LocalDateTime entryTime = ticket.getEntryTime();
-        LocalDateTime exitTime = LocalDateTime.now();
-
-        long minutesParked = ChronoUnit.MINUTES.between(entryTime, exitTime);
-
-        // Minimum 1 minute charge
-        if (minutesParked < 1) {
-            minutesParked = 1;
-        }
-
-        int pricePerMinute = ticket.getParkingSpot().getPrice();
-        double totalPrice = minutesParked * pricePerMinute;
-
-        // Display breakdown
-        System.out.printf("Duration: %d minutes @ ₹%d/min%n", minutesParked, pricePerMinute);
+        System.out.printf("Exit processed. Total fee: ₹%.2f%n", totalPrice);
 
         return totalPrice;
     }
@@ -102,6 +94,6 @@ public class Exit {
         if (ticket == null) {
             throw new IllegalArgumentException("Ticket cannot be null");
         }
-        return calculatePrice(ticket);
+        return pricingStrategy.calculatePrice(ticket, LocalDateTime.now());
     }
 }
