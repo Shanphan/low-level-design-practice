@@ -1,3 +1,14 @@
+# IDE
+.idea/
+*.iml
+
+# Gradle
+.gradle/
+build/
+
+# Claude
+.claude/
+
 # Compiled class file
 *.class
 
