@@ -1,19 +1,17 @@
 package entity;
 
+import enums.PaymentMode;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Getter
 @Setter
 @AllArgsConstructor
-@NoArgsConstructor
-
-public class Movie {
+public class Payment {
 
     String id;
-    String name;
-    int duration;
-    String genre;
+    PaymentMode paymentMode;
+    int amount;
+
 }
