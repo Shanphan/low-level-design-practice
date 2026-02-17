@@ -1,8 +1,14 @@
+package service;
 
-/**
- * Demonstrates the power of Strategy Pattern.
- * Shows how we can change algorithms at RUNTIME without touching existing code!
- */
+import entity.Ticket;
+import entity.Vehicle;
+import enums.SpotType;
+import manager.ParkingSpotManager;
+import strategy.FarthestSpotStrategy;
+import strategy.HourlyPricingStrategy;
+import strategy.NearestSpotStrategy;
+import strategy.PerMinutePricingStrategy;
+
 public class ParkingLotSystem {
 
     public static void main(String[] args) throws InterruptedException {

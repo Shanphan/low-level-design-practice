@@ -1,22 +1,23 @@
+package manager;
+
+import entity.FourWheelerSpot;
+import entity.ParkingSpot;
+import entity.TwoWheelerSpot;
+import entity.Vehicle;
+import enums.SpotType;
+import strategy.NearestSpotStrategy;
+import strategy.SpotSelectionStrategy;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Singleton manager responsible for managing all parking spots.
- * This class OWNS the parking spot data and provides methods to manage it.
- *
- * ✅ FIXED SINGLETON BUG - Now actually assigns instance
- * ✅ Thread-safe - Added synchronized
- * ✅ Manager owns all spot operations - find, occupy, free
- * ✅ Validation everywhere
- * ✅ Helper methods - getAvailableSpotCount, displayStatus
- * ✅ Easy to extend - Map handles any SpotType
- * ✅ Comments explain - "Strategy pattern coming later"
- *
- */
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ParkingSpotManager {
 
     private Map<SpotType, List<ParkingSpot>> parkingSpots;
@@ -42,32 +43,6 @@ public class ParkingSpotManager {
         }
         return instance;
     }
-    /**
-     * SET THE STRATEGY at runtime!
-     * This is the power of Strategy Pattern.
-     */
-    public void setSpotSelectionStrategy(SpotSelectionStrategy strategy) {
-        if (strategy == null) {
-            throw new IllegalArgumentException("Strategy cannot be null");
-        }
-        this.spotSelectionStrategy = strategy;
-        System.out.println("✓ Spot selection strategy changed to: " + strategy.getStrategyName());
-    }
-
-    public SpotSelectionStrategy getSpotSelectionStrategy() {
-        return spotSelectionStrategy;
-    }
-
-
-
-    public Map<SpotType, List<ParkingSpot>> getParkingSpots() {
-        return parkingSpots;
-    }
-
-    public void setParkingSpots(Map<SpotType, List<ParkingSpot>> parkingSpots) {
-        this.parkingSpots = parkingSpots;
-    }
-
     /**
      * Create initial parking spots for the parking lot.
      * @param numTwoWheeler Number of two-wheeler spots

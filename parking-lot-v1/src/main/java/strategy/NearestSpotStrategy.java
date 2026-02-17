@@ -1,3 +1,7 @@
+package strategy;
+
+import entity.ParkingSpot;
+
 import java.util.List;
 
 public class NearestSpotStrategy implements SpotSelectionStrategy {

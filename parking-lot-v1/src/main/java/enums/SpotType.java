@@ -1,3 +1,4 @@
+package enums;
 
 /**
  * Enum representing different types of parking spots.
