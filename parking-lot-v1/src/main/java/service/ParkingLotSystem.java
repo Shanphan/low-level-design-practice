@@ -9,6 +9,8 @@ import strategy.HourlyPricingStrategy;
 import strategy.NearestSpotStrategy;
 import strategy.PerMinutePricingStrategy;
 
+import java.util.Map;
+
 public class ParkingLotSystem {
 
     public static void main(String[] args) throws InterruptedException {
@@ -16,6 +18,16 @@ public class ParkingLotSystem {
         System.out.println("----------------------------------------");
         System.out.println("   STRATEGY PATTERN DEMONSTRATION      ");
         System.out.println("----------------------------------------");
+
+        // Pricing rates — strategy owns the rates, not the entity
+        Map<SpotType, Integer> perMinuteRates = Map.of(
+                SpotType.TWO_WHEELER, 2,
+                SpotType.FOUR_WHEELER, 5
+        );
+        Map<SpotType, Integer> hourlyRates = Map.of(
+                SpotType.TWO_WHEELER, 50,
+                SpotType.FOUR_WHEELER, 100
+        );
 
         // Initialize system
         ParkingSpotManager manager = ParkingSpotManager.getInstance();
@@ -77,7 +89,7 @@ public class ParkingLotSystem {
         // Test 4: Per-Minute Pricing (Default)
         // =============================================
         System.out.println("\n### TEST 4: Per-Minute Pricing ###");
-        exit.setPricingStrategy(new PerMinutePricingStrategy());
+        exit.setPricingStrategy(new PerMinutePricingStrategy(perMinuteRates));
 
         Thread.sleep(2000);  // Simulate 2 seconds parking
         double price1 = exit.processExit(t1);
@@ -87,7 +99,7 @@ public class ParkingLotSystem {
         // Test 5: Hourly Pricing with Daily Cap
         // =============================================
         System.out.println("\n### TEST 5: Hourly Pricing with Daily Cap ###");
-        exit.setPricingStrategy(new HourlyPricingStrategy());
+        exit.setPricingStrategy(new HourlyPricingStrategy(hourlyRates));
 
         double price2 = exit.processExit(t2);
         System.out.printf("Price with hourly (1 hour minimum): ₹%.2f%n", price2);
@@ -96,13 +108,13 @@ public class ParkingLotSystem {
         // Test 6: Flat Rate Pricing
         // =============================================
         System.out.println("\n### TEST 6: Flat Rate Pricing ###");
-        exit.setPricingStrategy(new HourlyPricingStrategy());
+        exit.setPricingStrategy(new HourlyPricingStrategy(hourlyRates));
 
         double price3 = exit.processExit(t3);
         System.out.printf("Price with flat rate: ₹%.2f%n", price3);
 
         // Clean up remaining vehicles
-        exit.setPricingStrategy(new PerMinutePricingStrategy());
+        exit.setPricingStrategy(new PerMinutePricingStrategy(perMinuteRates));
         exit.processExit(t4);
         exit.processExit(t5);
 

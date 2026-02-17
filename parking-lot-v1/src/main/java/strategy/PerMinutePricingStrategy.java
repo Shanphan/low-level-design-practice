@@ -1,33 +1,31 @@
 package strategy;
 
 import entity.Ticket;
+import enums.SpotType;
 
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
-
-/**
- * Simple per-minute pricing strategy.
- * <p>
- * Pricing: minutes × price_per_minute
- * Minimum charge: 1 minute
- * <p>
- * Use case: Short-term parking, quick stops
- */
+import java.util.Map;
 
 public class PerMinutePricingStrategy implements PricingStrategy {
+
+    private final Map<SpotType, Integer> ratePerMinute;
+
+    public PerMinutePricingStrategy(Map<SpotType, Integer> ratePerMinute) {
+        this.ratePerMinute = ratePerMinute;
+    }
+
     @Override
     public double calculatePrice(Ticket ticket, LocalDateTime exitTime) {
-        LocalDateTime entryTime = ticket.getEntryTime();
+        long minutesParked = ChronoUnit.MINUTES.between(ticket.getEntryTime(), exitTime);
 
-        long minutesParked = ChronoUnit.MINUTES.between(entryTime, exitTime);
-
-        // Minimum 1 minute charge
         if (minutesParked < 1) {
             minutesParked = 1;
         }
 
-        int pricePerMinute = ticket.getParkingSpot().getPrice();
-        return minutesParked * pricePerMinute;
+        SpotType spotType = ticket.getParkingSpot().getParkingSpotType();
+        int rate = ratePerMinute.getOrDefault(spotType, 0);
+        return minutesParked * rate;
     }
 
     @Override

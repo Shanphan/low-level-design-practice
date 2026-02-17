@@ -2,7 +2,6 @@ package manager;
 
 import entity.Flight;
 import entity.Seat;
-import enums.SeatStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -71,16 +70,8 @@ public class FlightManager {
         }
 
         try {
-            // check all available
             for (Seat seat : resolvedSeats) {
-                if (!seat.isAvailable()) {
-                    throw new RuntimeException("Seat " + seat.getId() + " is not available");
-                }
-            }
-
-            // book all
-            for (Seat seat : resolvedSeats) {
-                seat.setSeatStatus(SeatStatus.BOOKED);
+                seat.book();
             }
 
             return resolvedSeats;
@@ -104,7 +95,7 @@ public class FlightManager {
 
         try {
             for (Seat seat : sortedSeats) {
-                seat.setSeatStatus(SeatStatus.AVAILABLE);
+                seat.release();
             }
         } finally {
             for (Seat seat : sortedSeats) {

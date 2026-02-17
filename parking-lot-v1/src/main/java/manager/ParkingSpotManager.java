@@ -1,8 +1,6 @@
 package manager;
 
-import entity.FourWheelerSpot;
 import entity.ParkingSpot;
-import entity.TwoWheelerSpot;
 import entity.Vehicle;
 import enums.SpotType;
 import strategy.NearestSpotStrategy;
@@ -53,14 +51,12 @@ public class ParkingSpotManager {
             throw new IllegalArgumentException("Number of spots cannot be negative");
         }
 
-        // Create two-wheeler spots
         for (int i = 0; i < numTwoWheeler; i++) {
-            parkingSpots.get(SpotType.TWO_WHEELER).add(new TwoWheelerSpot());
+            parkingSpots.get(SpotType.TWO_WHEELER).add(new ParkingSpot(SpotType.TWO_WHEELER));
         }
 
-        // Create four-wheeler spots
         for (int i = 0; i < numFourWheeler; i++) {
-            parkingSpots.get(SpotType.FOUR_WHEELER).add(new FourWheelerSpot());
+            parkingSpots.get(SpotType.FOUR_WHEELER).add(new ParkingSpot(SpotType.FOUR_WHEELER));
         }
 
         System.out.println("Parking lot initialized:");
@@ -78,13 +74,7 @@ public class ParkingSpotManager {
             throw new IllegalArgumentException("Spot type cannot be null");
         }
 
-        ParkingSpot newSpot = switch (spotType) {
-            case TWO_WHEELER -> new TwoWheelerSpot();
-            case FOUR_WHEELER -> new FourWheelerSpot();
-            default -> throw new IllegalArgumentException("Unknown spot type: " + spotType);
-        };
-
-        parkingSpots.get(spotType).add(newSpot);
+        parkingSpots.get(spotType).add(new ParkingSpot(spotType));
         System.out.println("Added new " + spotType.getDisplayName() + " spot");
     }
 

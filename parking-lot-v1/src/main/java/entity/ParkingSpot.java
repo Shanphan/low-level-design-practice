@@ -6,7 +6,7 @@ import lombok.ToString;
 
 @Getter
 @ToString
-public abstract class ParkingSpot extends Entity {
+public class ParkingSpot extends Entity {
 
     private boolean isEmpty;
     private Vehicle vehicle;
@@ -43,7 +43,4 @@ public abstract class ParkingSpot extends Entity {
         this.isEmpty = true;
     }
 
-    public int getPrice() {
-        return parkingSpotType.getBasePrice();
-    }
 }
