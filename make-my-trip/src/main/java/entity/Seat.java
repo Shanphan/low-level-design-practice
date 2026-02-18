@@ -9,7 +9,6 @@ import lombok.Setter;
 import java.util.concurrent.locks.ReentrantLock;
 
 @Getter
-@Setter
 @NoArgsConstructor
 public class Seat {
 
@@ -30,5 +29,19 @@ public class Seat {
 
     public boolean isAvailable() {
         return seatStatus == SeatStatus.AVAILABLE;
+    }
+
+    public void book() {
+        if (seatStatus != SeatStatus.AVAILABLE) {
+            throw new RuntimeException("Seat " + id + " is not available");
+        }
+        this.seatStatus = SeatStatus.BOOKED;
+    }
+
+    public void release() {
+        if (seatStatus != SeatStatus.BOOKED) {
+            throw new RuntimeException("Seat " + id + " is not booked");
+        }
+        this.seatStatus = SeatStatus.AVAILABLE;
     }
 }

@@ -1,22 +1,22 @@
+package manager;
+
+import entity.ParkingSpot;
+import entity.Vehicle;
+import enums.SpotSelectionType;
+import enums.SpotType;
+import strategy.SpotSelectionStrategy;
+import strategy.SpotSelectionStrategyFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-/**
- * Singleton manager responsible for managing all parking spots.
- * This class OWNS the parking spot data and provides methods to manage it.
- *
- * ✅ FIXED SINGLETON BUG - Now actually assigns instance
- * ✅ Thread-safe - Added synchronized
- * ✅ Manager owns all spot operations - find, occupy, free
- * ✅ Validation everywhere
- * ✅ Helper methods - getAvailableSpotCount, displayStatus
- * ✅ Easy to extend - Map handles any SpotType
- * ✅ Comments explain - "Strategy pattern coming later"
- *
- */
+import lombok.Getter;
+import lombok.Setter;
 
+@Getter
+@Setter
 public class ParkingSpotManager {
 
     private Map<SpotType, List<ParkingSpot>> parkingSpots;
@@ -25,7 +25,7 @@ public class ParkingSpotManager {
 
     private ParkingSpotManager() {
         this.parkingSpots = new HashMap<>();
-        this.spotSelectionStrategy = new NearestSpotStrategy();
+        this.spotSelectionStrategy = SpotSelectionStrategyFactory.create(SpotSelectionType.NEAREST);
         // Initialize empty lists for each spot type
         for (SpotType type : SpotType.values()) {
             parkingSpots.put(type, new ArrayList<>());
@@ -43,32 +43,6 @@ public class ParkingSpotManager {
         return instance;
     }
     /**
-     * SET THE STRATEGY at runtime!
-     * This is the power of Strategy Pattern.
-     */
-    public void setSpotSelectionStrategy(SpotSelectionStrategy strategy) {
-        if (strategy == null) {
-            throw new IllegalArgumentException("Strategy cannot be null");
-        }
-        this.spotSelectionStrategy = strategy;
-        System.out.println("✓ Spot selection strategy changed to: " + strategy.getStrategyName());
-    }
-
-    public SpotSelectionStrategy getSpotSelectionStrategy() {
-        return spotSelectionStrategy;
-    }
-
-
-
-    public Map<SpotType, List<ParkingSpot>> getParkingSpots() {
-        return parkingSpots;
-    }
-
-    public void setParkingSpots(Map<SpotType, List<ParkingSpot>> parkingSpots) {
-        this.parkingSpots = parkingSpots;
-    }
-
-    /**
      * Create initial parking spots for the parking lot.
      * @param numTwoWheeler Number of two-wheeler spots
      * @param numFourWheeler Number of four-wheeler spots
@@ -78,14 +52,12 @@ public class ParkingSpotManager {
             throw new IllegalArgumentException("Number of spots cannot be negative");
         }
 
-        // Create two-wheeler spots
         for (int i = 0; i < numTwoWheeler; i++) {
-            parkingSpots.get(SpotType.TWO_WHEELER).add(new TwoWheelerSpot());
+            parkingSpots.get(SpotType.TWO_WHEELER).add(new ParkingSpot(SpotType.TWO_WHEELER));
         }
 
-        // Create four-wheeler spots
         for (int i = 0; i < numFourWheeler; i++) {
-            parkingSpots.get(SpotType.FOUR_WHEELER).add(new FourWheelerSpot());
+            parkingSpots.get(SpotType.FOUR_WHEELER).add(new ParkingSpot(SpotType.FOUR_WHEELER));
         }
 
         System.out.println("Parking lot initialized:");
@@ -103,13 +75,7 @@ public class ParkingSpotManager {
             throw new IllegalArgumentException("Spot type cannot be null");
         }
 
-        ParkingSpot newSpot = switch (spotType) {
-            case TWO_WHEELER -> new TwoWheelerSpot();
-            case FOUR_WHEELER -> new FourWheelerSpot();
-            default -> throw new IllegalArgumentException("Unknown spot type: " + spotType);
-        };
-
-        parkingSpots.get(spotType).add(newSpot);
+        parkingSpots.get(spotType).add(new ParkingSpot(spotType));
         System.out.println("Added new " + spotType.getDisplayName() + " spot");
     }
 

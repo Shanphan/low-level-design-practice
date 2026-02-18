@@ -1,3 +1,7 @@
+package strategy;
+
+import entity.Ticket;
+
 import java.time.LocalDateTime;
 
 /**

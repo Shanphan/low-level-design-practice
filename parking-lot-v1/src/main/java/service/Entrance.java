@@ -1,5 +1,12 @@
+package service;
+
+import entity.ParkingSpot;
+import entity.Ticket;
+import entity.Vehicle;
+import enums.SpotType;
+import manager.ParkingSpotManager;
+
 import java.time.LocalDateTime;
-import java.time.LocalTime;
 
 /**
  * Singleton class representing the parking lot entrance.
@@ -76,7 +83,7 @@ public class Entrance {
 
         //strategy First Empty Spot simple
         ParkingSpot parkingSpot = null;
-        for(ParkingSpot ps : parkingSpotManager.getParkingSpots().get(vehicle.vehicleType)) {
+        for(ParkingSpot ps : parkingSpotManager.getParkingSpots().get(vehicle.getVehicleType())) {
             if(ps.isEmpty()) {
                 parkingSpot = ps;
                 parkingSpot.parkVehicle(vehicle);

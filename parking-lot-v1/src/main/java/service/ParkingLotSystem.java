@@ -1,8 +1,16 @@
+package service;
 
-/**
- * Demonstrates the power of Strategy Pattern.
- * Shows how we can change algorithms at RUNTIME without touching existing code!
- */
+import entity.Ticket;
+import entity.Vehicle;
+import enums.PricingType;
+import enums.SpotSelectionType;
+import enums.SpotType;
+import manager.ParkingSpotManager;
+import strategy.PricingStrategyFactory;
+import strategy.SpotSelectionStrategyFactory;
+
+import java.util.Map;
+
 public class ParkingLotSystem {
 
     public static void main(String[] args) throws InterruptedException {
@@ -10,6 +18,16 @@ public class ParkingLotSystem {
         System.out.println("----------------------------------------");
         System.out.println("   STRATEGY PATTERN DEMONSTRATION      ");
         System.out.println("----------------------------------------");
+
+        // Pricing rates — strategy owns the rates, not the entity
+        Map<SpotType, Integer> perMinuteRates = Map.of(
+                SpotType.TWO_WHEELER, 2,
+                SpotType.FOUR_WHEELER, 5
+        );
+        Map<SpotType, Integer> hourlyRates = Map.of(
+                SpotType.TWO_WHEELER, 50,
+                SpotType.FOUR_WHEELER, 100
+        );
 
         // Initialize system
         ParkingSpotManager manager = ParkingSpotManager.getInstance();
@@ -26,7 +44,7 @@ public class ParkingLotSystem {
         // Test 1: First Available Strategy (Default)
         // =============================================
         System.out.println("\n### TEST 1: First Available Strategy ###");
-        manager.setSpotSelectionStrategy(new FarthestSpotStrategy());
+        manager.setSpotSelectionStrategy(SpotSelectionStrategyFactory.create(SpotSelectionType.FARTHEST));
 
         Vehicle v1 = new Vehicle("KA01 A001", SpotType.TWO_WHEELER);
         Vehicle v2 = new Vehicle("KA01 A002", SpotType.TWO_WHEELER);
@@ -34,24 +52,24 @@ public class ParkingLotSystem {
         Ticket t1 = entrance.parkVehicle(v1);
         Ticket t2 = entrance.parkVehicle(v2);
 
-        System.out.println("✓ Both vehicles got first available spots");
+        System.out.println("✓ Both vehicles got farthest available spots");
 
         // =============================================
-        // Test 2: Farthest Spot Strategy
+        // Test 2: Nearest Spot Strategy
         // =============================================
-        System.out.println("\n### TEST 2: Farthest Spot Strategy ###");
-        manager.setSpotSelectionStrategy(new FarthestSpotStrategy());
+        System.out.println("\n### TEST 2: Nearest Spot Strategy ###");
+        manager.setSpotSelectionStrategy(SpotSelectionStrategyFactory.create(SpotSelectionType.NEAREST));
 
         Vehicle v3 = new Vehicle("KA01 A003", SpotType.TWO_WHEELER);
         Ticket t3 = entrance.parkVehicle(v3);
 
-        System.out.println("✓ Vehicle assigned farthest available spot");
+        System.out.println("✓ Vehicle assigned nearest available spot");
 
         // =============================================
-        // Test 3: Random Spot Strategy
+        // Test 3: Farthest Spot Strategy again
         // =============================================
-        System.out.println("\n### TEST 3: Random Spot Strategy ###");
-        manager.setSpotSelectionStrategy(new NearestSpotStrategy());
+        System.out.println("\n### TEST 3: Farthest Spot Strategy ###");
+        manager.setSpotSelectionStrategy(SpotSelectionStrategyFactory.create(SpotSelectionType.NEAREST));
 
         Vehicle v4 = new Vehicle("KA01 A004", SpotType.TWO_WHEELER);
         Vehicle v5 = new Vehicle("KA01 A005", SpotType.TWO_WHEELER);
@@ -71,7 +89,7 @@ public class ParkingLotSystem {
         // Test 4: Per-Minute Pricing (Default)
         // =============================================
         System.out.println("\n### TEST 4: Per-Minute Pricing ###");
-        exit.setPricingStrategy(new PerMinutePricingStrategy());
+        exit.setPricingStrategy(PricingStrategyFactory.create(PricingType.valueOf("PER_MINUTE"), perMinuteRates));
 
         Thread.sleep(2000);  // Simulate 2 seconds parking
         double price1 = exit.processExit(t1);
@@ -81,7 +99,7 @@ public class ParkingLotSystem {
         // Test 5: Hourly Pricing with Daily Cap
         // =============================================
         System.out.println("\n### TEST 5: Hourly Pricing with Daily Cap ###");
-        exit.setPricingStrategy(new HourlyPricingStrategy());
+        exit.setPricingStrategy(PricingStrategyFactory.create(PricingType.valueOf("HOURLY"), hourlyRates));
 
         double price2 = exit.processExit(t2);
         System.out.printf("Price with hourly (1 hour minimum): ₹%.2f%n", price2);
@@ -90,13 +108,13 @@ public class ParkingLotSystem {
         // Test 6: Flat Rate Pricing
         // =============================================
         System.out.println("\n### TEST 6: Flat Rate Pricing ###");
-        exit.setPricingStrategy(new HourlyPricingStrategy());
+        exit.setPricingStrategy(PricingStrategyFactory.create(PricingType.valueOf("HOURLY"), hourlyRates));
 
         double price3 = exit.processExit(t3);
         System.out.printf("Price with flat rate: ₹%.2f%n", price3);
 
         // Clean up remaining vehicles
-        exit.setPricingStrategy(new PerMinutePricingStrategy());
+        exit.setPricingStrategy(PricingStrategyFactory.create(PricingType.valueOf("PER_MINUTE"), perMinuteRates));
         exit.processExit(t4);
         exit.processExit(t5);
 
