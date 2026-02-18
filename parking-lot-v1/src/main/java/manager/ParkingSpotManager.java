@@ -2,9 +2,10 @@ package manager;
 
 import entity.ParkingSpot;
 import entity.Vehicle;
+import enums.SpotSelectionType;
 import enums.SpotType;
-import strategy.NearestSpotStrategy;
 import strategy.SpotSelectionStrategy;
+import strategy.SpotSelectionStrategyFactory;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -24,7 +25,7 @@ public class ParkingSpotManager {
 
     private ParkingSpotManager() {
         this.parkingSpots = new HashMap<>();
-        this.spotSelectionStrategy = new NearestSpotStrategy();
+        this.spotSelectionStrategy = SpotSelectionStrategyFactory.create(SpotSelectionType.NEAREST);
         // Initialize empty lists for each spot type
         for (SpotType type : SpotType.values()) {
             parkingSpots.put(type, new ArrayList<>());
