@@ -13,8 +13,8 @@ A flight booking system that allows users to search flights, view available seat
 | Pattern | Where | Why |
 |---|---|---|
 | Singleton (double-checked locking) | AirportManager, FlightManager, BookingManager | Single shared instance across the app |
-| Manager Pattern | All managers | Centralized business logic per entity |
-| Service Layer | MakeMyTrip | Orchestrates the booking workflow |
+| manager Pattern | All managers | Centralized business logic per entity |
+| service Layer | MakeMyTrip | Orchestrates the booking workflow |
 | Composition over Inheritance | Flight has Airplane + Airports; Booking has Flight + Passenger | Flexible entity relationships |
 | ReentrantLock + Consistent Lock Ordering | FlightManager.reserveSeats() | Thread-safe booking, deadlock prevention |
 | ID-based Resolution | reserveSeats(flight, seatIds) | Resolves seats from flight map — avoids detached object mutation |
@@ -47,7 +47,7 @@ make-my-trip/src/main/java/
 ## Class Diagram
 ```
                     ┌─────────────┐
-                    │ MakeMyTrip  │ (Service)
+                    │ MakeMyTrip  │ (service)
                     └──────┬──────┘
             ┌──────────────┼──────────────┐
             ▼              ▼              ▼

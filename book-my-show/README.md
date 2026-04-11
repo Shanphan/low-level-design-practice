@@ -13,8 +13,8 @@ A movie ticket booking system that allows users to search movies, browse shows a
 | Pattern | Where | Why |
 |---|---|---|
 | Singleton (double-checked locking) | MovieManager, TheatreManager, BookingManager | Single shared instance across the app |
-| Manager Pattern | All managers | Centralized business logic per entity |
-| Service Layer | BokMyShow | Orchestrates the booking workflow |
+| manager Pattern | All managers | Centralized business logic per entity |
+| service Layer | BokMyShow | Orchestrates the booking workflow |
 | Composition over Inheritance | Show has Movie + Screen; Booking has Show + Seats | Flexible entity relationships |
 | ReentrantLock + Consistent Lock Ordering | TheatreManager.reserveSeats() | Thread-safe booking, deadlock prevention |
 
@@ -45,7 +45,7 @@ book-my-show/src/main/java/
 ## Class Diagram
 ```
                     ┌─────────────┐
-                    │  BokMyShow  │ (Service)
+                    │  BokMyShow  │ (service)
                     └──────┬──────┘
             ┌──────────────┼──────────────┐
             ▼              ▼              ▼
