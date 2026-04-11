@@ -8,7 +8,7 @@ public class Product {
     private Integer reserveQuantity;
 
     public Product(String name, Integer totalQuantity) {
-        this.id = IdGenerator.setId("PRODUCT");
+        this.id = IdGenerator.generate("PRODUCT");
         this.name = name;
         this.totalQuantity = totalQuantity;
         this.reserveQuantity = 0;

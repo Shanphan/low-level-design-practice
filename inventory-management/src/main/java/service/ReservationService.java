@@ -1,13 +1,13 @@
-package Service;
+package service;
 
-import Manager.ProductMgr;
-import Manager.ReservationMgr;
+import manager.ProductMgr;
+import manager.ReservationMgr;
 import entity.Product;
 import entity.Reservation;
 import entity.ReservationStatus;
-import exceptions.ProductNotAvailable;
+import exceptions.ProductNotAvailableException;
 import exceptions.ProductNotFoundException;
-import exceptions.ReservationNotFound;
+import exceptions.ReservationNotFoundException;
 
 public class ReservationService {
 
@@ -28,7 +28,7 @@ public class ReservationService {
 
         int availableQ = product.getTotalQuantity() - product.getReserveQuantity();
         if(availableQ <= 0 && availableQ <product.getTotalQuantity()) {
-            throw new ProductNotAvailable("Product not available " + product.getName());
+            throw new ProductNotAvailableException("Product not available " + product.getName());
         }
 
         Reservation reservation = new Reservation(productId, userId, q);
@@ -43,7 +43,7 @@ public class ReservationService {
         Reservation reservation = reservationMgr.findById(resId);
 
         if(reservation == null) {
-            throw  new ReservationNotFound("No reservation found with id " + resId);
+            throw  new ReservationNotFoundException("No reservation found with id " + resId);
         }
 
         if(!reservation.getReservationStatus().canTransitionTo(ReservationStatus.CONFIRMED)) {
@@ -66,7 +66,7 @@ public class ReservationService {
         Reservation reservation = reservationMgr.findById(resId);
 
         if(reservation == null) {
-            throw  new ReservationNotFound("No reservation found with id " + resId);
+            throw  new ReservationNotFoundException("No reservation found with id " + resId);
         }
 
         if(!reservation.getReservationStatus().canTransitionTo(ReservationStatus.CANCELLED)) {

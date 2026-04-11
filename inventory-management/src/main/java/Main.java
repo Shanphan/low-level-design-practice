@@ -1,8 +1,8 @@
-import Manager.ProductMgr;
-import Manager.ReservationMgr;
-import Manager.UserMgr;
-import Service.ProductService;
-import Service.ReservationService;
+import manager.ProductMgr;
+import manager.ReservationMgr;
+import manager.UserMgr;
+import service.ProductService;
+import service.ReservationService;
 import entity.Product;
 import entity.Reservation;
 import entity.User;

@@ -1,6 +1,6 @@
-package Service;
+package service;
 
-import Manager.ProductMgr;
+import manager.ProductMgr;
 import entity.Product;
 import exceptions.ProductNotFoundException;
 import exceptions.ProductStillReservedException;

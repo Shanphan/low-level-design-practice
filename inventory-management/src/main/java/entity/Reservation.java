@@ -9,7 +9,7 @@ public class Reservation {
     private Integer quantity;
 
     public Reservation(String productId, String userId, Integer quantity) {
-        this.id = IdGenerator.setId("RESERVATION");
+        this.id = IdGenerator.generate("RESERVATION");
         this.productId = productId;
         this.userId = userId;
         this.reservationStatus = ReservationStatus.PENDING;

@@ -1,4 +1,4 @@
-package Manager;
+package manager;
 
 import entity.Reservation;
 
@@ -14,7 +14,8 @@ public class ReservationMgr {
     }
 
     public Reservation save(Reservation reservation) {
-        return reservations.put(reservation.getId(), reservation);
+        reservations.put(reservation.getId(), reservation);
+        return reservation;
     }
 
     public Reservation findById (String id) {

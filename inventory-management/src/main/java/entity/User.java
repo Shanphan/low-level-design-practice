@@ -6,7 +6,7 @@ public class User {
     private String name;
 
     public User( String name) {
-        this.id = IdGenerator.setId("USER");
+        this.id = IdGenerator.generate("USER");
         this.name = name;
     }
 

@@ -4,9 +4,7 @@ import java.util.UUID;
 
 public class IdGenerator {
 
-    private static String id;
-
-    public static String setId(String prefix) {
+    public static String generate(String prefix) {
         return prefix + "-" + UUID.randomUUID();
     }
 }

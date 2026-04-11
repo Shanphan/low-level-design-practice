@@ -1,4 +1,4 @@
-package Manager;
+package manager;
 
 import entity.User;
 
@@ -14,7 +14,8 @@ public class UserMgr {
     }
 
     public User save(User user) {
-        return users.put(user.getId(), user);
+        users.put(user.getId(), user);
+        return user;
     }
 
     public User findById(String id) {
