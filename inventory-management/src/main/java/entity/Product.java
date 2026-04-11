@@ -1,13 +1,17 @@
 package entity;
 
+import java.util.concurrent.locks.ReentrantLock;
+
 public class Product {
 
     private String id;
     private String name;
     private Integer totalQuantity;
     private Integer reserveQuantity;
+    private final ReentrantLock rowLock;
 
     public Product(String name, Integer totalQuantity) {
+        this.rowLock = new ReentrantLock();
         this.id = IdGenerator.generate("PRODUCT");
         this.name = name;
         this.totalQuantity = totalQuantity;
@@ -40,6 +44,10 @@ public class Product {
 
     public void setReserveQuantity(Integer reserveQuantity) {
         this.reserveQuantity = reserveQuantity;
+    }
+
+    public ReentrantLock getRowLock() {
+        return rowLock;
     }
 
     @Override
