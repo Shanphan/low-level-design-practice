@@ -40,6 +40,18 @@ public class ProductService {
         productMgr.save(product);
     }
 
+    public int getAvailableInventory(String productId) {
+
+        Product product = productMgr.findById(productId);
+
+        if(product == null) {
+            throw new ProductNotFoundException("Product not found with product Id " + productId);
+        }
+
+        return product.getTotalQuantity() + product.getReserveQuantity();
+
+    }
+
 
 }
 

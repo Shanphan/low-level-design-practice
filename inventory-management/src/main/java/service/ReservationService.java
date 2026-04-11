@@ -27,7 +27,7 @@ public class ReservationService {
         }
 
         int availableQ = product.getTotalQuantity() - product.getReserveQuantity();
-        if(availableQ <= 0 && availableQ <product.getTotalQuantity()) {
+        if(availableQ <= 0 || availableQ > product.getTotalQuantity()) {
             throw new ProductNotAvailableException("Product not available " + product.getName());
         }
 

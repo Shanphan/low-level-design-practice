@@ -26,13 +26,16 @@ public class Main {
 
         productService.addProduct(p1);
         productService.addProduct(p2);
+        System.out.println(p1.toString());
 
         Reservation reservation = reservationService.reserve(p1.getId(), u.getId(), 1);
-
+        System.out.println(reservation.toString());
+        System.out.println(p1.toString());
 
         reservationService.confirm(reservation.getId());
+        System.out.println(reservation.toString());
+        System.out.println(p1.toString());
 
-        reservationService.cancel(reservation.getId());
 
 
 

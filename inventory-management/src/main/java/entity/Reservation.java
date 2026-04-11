@@ -51,4 +51,11 @@ public class Reservation {
     public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
+
+    @Override
+    public String toString() {
+
+        return "Reservation [" + this.getId() + ", " + this.getProductId() + ", " + this.getUserId()
+                + ", " + this.getReservationStatus().name() + ", " + this.getQuantity() + "]";
+    }
 }

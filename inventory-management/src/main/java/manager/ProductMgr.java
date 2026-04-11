@@ -27,7 +27,7 @@ public class ProductMgr {
         return products.get(id);
     }
 
-    public List<Product> finaAll() {
+    public List<Product> findAll() {
         return products.values().stream().toList();
     }
 }

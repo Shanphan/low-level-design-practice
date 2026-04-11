@@ -41,4 +41,9 @@ public class Product {
     public void setReserveQuantity(Integer reserveQuantity) {
         this.reserveQuantity = reserveQuantity;
     }
+
+    @Override
+    public String toString() {
+        return "Product [" +this.name + ", " + this.id + ", "+ this.totalQuantity + ", "+ this.reserveQuantity + "]";
+    }
 }
