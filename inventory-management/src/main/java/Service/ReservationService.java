@@ -1,0 +1,87 @@
+package Service;
+
+import Manager.ProductMgr;
+import Manager.ReservationMgr;
+import entity.Product;
+import entity.Reservation;
+import entity.ReservationStatus;
+import exceptions.ProductNotAvailable;
+import exceptions.ProductNotFoundException;
+import exceptions.ReservationNotFound;
+
+public class ReservationService {
+
+    private final ReservationMgr reservationMgr;
+    private final ProductMgr productMgr;
+
+    public ReservationService(ReservationMgr reservationMgr, ProductMgr productMgr) {
+        this.reservationMgr = reservationMgr;
+        this.productMgr = productMgr;
+    }
+
+    public Reservation reserve(String productId, String userId, int q) {
+
+        Product product = productMgr.findById(productId);
+        if(product == null) {
+            throw new ProductNotFoundException("Product not found with product Id " + productId);
+        }
+
+        int availableQ = product.getTotalQuantity() - product.getReserveQuantity();
+        if(availableQ <= 0 && availableQ <product.getTotalQuantity()) {
+            throw new ProductNotAvailable("Product not available " + product.getName());
+        }
+
+        Reservation reservation = new Reservation(productId, userId, q);
+        product.setReserveQuantity(product.getReserveQuantity() + q);
+        productMgr.save(product);
+        reservationMgr.save(reservation);
+
+        return reservation;
+    }
+
+    public void confirm (String resId) {
+        Reservation reservation = reservationMgr.findById(resId);
+
+        if(reservation == null) {
+            throw  new ReservationNotFound("No reservation found with id " + resId);
+        }
+
+        if(!reservation.getReservationStatus().canTransitionTo(ReservationStatus.CONFIRMED)) {
+            throw new IllegalStateException("Cannot go from " + reservation.getReservationStatus().name() + " to "
+                    + ReservationStatus.CONFIRMED.name());
+        }
+
+        Product product = productMgr.findById(reservation.getProductId());
+
+        product.setTotalQuantity(product.getTotalQuantity() - reservation.getQuantity());
+        product.setReserveQuantity(product.getReserveQuantity() - reservation.getQuantity());
+        reservation.setReservationStatus(ReservationStatus.CONFIRMED);
+
+        productMgr.save(product);
+        reservationMgr.save(reservation);
+    }
+
+    public void cancel (String resId) {
+
+        Reservation reservation = reservationMgr.findById(resId);
+
+        if(reservation == null) {
+            throw  new ReservationNotFound("No reservation found with id " + resId);
+        }
+
+        if(!reservation.getReservationStatus().canTransitionTo(ReservationStatus.CANCELLED)) {
+            throw new IllegalStateException("Cannot go from " + reservation.getReservationStatus().name() + "to " + ReservationStatus.CANCELLED.name());
+        }
+
+        Product product = productMgr.findById(reservation.getProductId());
+        product.setReserveQuantity(product.getReserveQuantity() - reservation.getQuantity());
+        reservation.setReservationStatus(ReservationStatus.CANCELLED);
+
+        productMgr.save(product);
+        reservationMgr.save(reservation);
+
+
+    }
+
+
+}

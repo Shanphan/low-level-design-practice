@@ -1,0 +1,44 @@
+package entity;
+
+public class Product {
+
+    private String id;
+    private String name;
+    private Integer totalQuantity;
+    private Integer reserveQuantity;
+
+    public Product(String name, Integer totalQuantity) {
+        this.id = IdGenerator.setId("PRODUCT");
+        this.name = name;
+        this.totalQuantity = totalQuantity;
+        this.reserveQuantity = 0;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public Integer getTotalQuantity() {
+        return totalQuantity;
+    }
+
+    public void setTotalQuantity(Integer totalQuantity) {
+        this.totalQuantity = totalQuantity;
+    }
+
+    public Integer getReserveQuantity() {
+        return reserveQuantity;
+    }
+
+    public void setReserveQuantity(Integer reserveQuantity) {
+        this.reserveQuantity = reserveQuantity;
+    }
+}
