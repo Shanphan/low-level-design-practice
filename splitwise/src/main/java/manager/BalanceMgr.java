@@ -27,8 +27,7 @@ public class BalanceMgr {
 
 
     public Map<String, Double> getBalancesForUser(String userId) {
-        // return balances[userId] → everyone they owe / are owed by
-        return balanceSheet.get(userId);
+        return balanceSheet.getOrDefault(userId, new HashMap<>());
     }
 
 

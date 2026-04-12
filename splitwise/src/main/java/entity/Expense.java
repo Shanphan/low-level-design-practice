@@ -10,12 +10,12 @@ public class Expense {
     private String id;
     private String groupId;
     private String paidByUserId;
-    private Double amount;
+    private double amount;
     private SplitType splitType;
     private Map<String, Double> splitDetails; //based on strategy
 
-    public Expense (String groupId, String paidByUserId, Double amount, SplitType splitType) {
-        this.id = IdGenerator.createId("EXPENSE ");
+    public Expense (String groupId, String paidByUserId, double amount, SplitType splitType) {
+        this.id = IdGenerator.createId("EXPENSE");
         this.groupId = groupId;
         this.paidByUserId = paidByUserId;
         this.amount = amount;
@@ -43,7 +43,7 @@ public class Expense {
         this.splitDetails = splitDetails;
     }
 
-    public Double getAmount() {
+    public double getAmount() {
         return amount;
     }
 

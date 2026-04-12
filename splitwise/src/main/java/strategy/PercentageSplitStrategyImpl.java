@@ -9,6 +9,13 @@ import java.util.Set;
 public class PercentageSplitStrategyImpl implements SplitStrategy {
     @Override
     public Map<String, Double> splits(double amount, Map<String, Double> splitDetails, Set<String> participants) {
+        if (splitDetails == null || splitDetails.isEmpty()) {
+            throw new IllegalArgumentException("Split details required for percentage split");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Amount must be greater than 0");
+        }
+
         Map<String, Double> result = new HashMap<>();
 
         double total = splitDetails.values()

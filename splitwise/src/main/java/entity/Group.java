@@ -13,7 +13,7 @@ public class Group {
     private final Set<String> memberIds;
 
     public Group(String name) {
-        this.id = IdGenerator.createId("GROUP ");
+        this.id = IdGenerator.createId("GROUP");
         this.name = name;
         this.memberIds = new HashSet<>();
     }
