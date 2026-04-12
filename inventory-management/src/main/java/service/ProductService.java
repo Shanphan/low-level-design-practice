@@ -19,12 +19,11 @@ public class ProductService {
 
     public void removeProduct(Product product) {
 
+        product.getRowLock().lock();
         try {
-            product.getRowLock().lock();
             if(product.getReserveQuantity() > 0) {
-                throw new ProductStillReservedException("Cannot remove product. It has " + product.getReserveQuantity() + "reservations");
+                throw new ProductStillReservedException("Cannot remove product. It has " + product.getReserveQuantity() + " reservations");
             }
-
             productMgr.delete(product.getId());
         } finally {
             product.getRowLock().unlock();
@@ -39,9 +38,8 @@ public class ProductService {
         if(product == null) {
             throw new ProductNotFoundException("Product not found with product Id " + productId);
         }
+        product.getRowLock().lock();
         try {
-            product.getRowLock().lock();
-
             int totalQ = product.getTotalQuantity() + quantity;
             product.setTotalQuantity(totalQ);
             productMgr.save(product);
@@ -60,8 +58,8 @@ public class ProductService {
             throw new ProductNotFoundException("Product not found with product Id " + productId);
         }
 
+        product.getRowLock().lock();
         try {
-            product.getRowLock().lock();
             return product.getTotalQuantity() - product.getReserveQuantity();
         } finally {
             product.getRowLock().unlock();

@@ -27,14 +27,13 @@ public class ReservationService {
             throw new ProductNotFoundException("Product not found with product Id " + productId);
         }
 
+        product.getRowLock().lock();
         try {
-
-            product.getRowLock().lock();
             if(reservationMgr.findReservationByProductIdAndUserId(userId, productId) != null) {
                 throw new DuplicateReservationException("User " + userId + " already has a pending reservation for product " + productId);
             }
             int availableQ = product.getTotalQuantity() - product.getReserveQuantity();
-            if(availableQ <= 0 || q > availableQ) {
+            if(q > availableQ) {
                 throw new ProductNotAvailableException("Product not available " + product.getName());
             }
 
@@ -44,8 +43,6 @@ public class ReservationService {
             reservationMgr.save(reservation);
 
             return reservation;
-
-
         } finally {
             product.getRowLock().unlock();
         }
@@ -60,9 +57,8 @@ public class ReservationService {
         }
 
         Product product = productMgr.findById(reservation.getProductId());
+        product.getRowLock().lock();
         try {
-            product.getRowLock().lock();
-
             if(!reservation.getReservationStatus().canTransitionTo(ReservationStatus.CONFIRMED)) {
                 throw new IllegalStateException("Cannot go from " + reservation.getReservationStatus().name() + " to "
                         + ReservationStatus.CONFIRMED.name());
@@ -88,17 +84,16 @@ public class ReservationService {
         }
 
         Product product = productMgr.findById(reservation.getProductId());
+        product.getRowLock().lock();
         try {
-            product.getRowLock().lock();
             if(!reservation.getReservationStatus().canTransitionTo(ReservationStatus.CANCELLED)) {
-                throw new IllegalStateException("Cannot go from " + reservation.getReservationStatus().name() + "to " + ReservationStatus.CANCELLED.name());
+                throw new IllegalStateException("Cannot go from " + reservation.getReservationStatus().name() + " to " + ReservationStatus.CANCELLED.name());
             }
             product.setReserveQuantity(product.getReserveQuantity() - reservation.getQuantity());
             reservation.setReservationStatus(ReservationStatus.CANCELLED);
 
             productMgr.save(product);
             reservationMgr.save(reservation);
-
         } finally {
             product.getRowLock().unlock();
         }
