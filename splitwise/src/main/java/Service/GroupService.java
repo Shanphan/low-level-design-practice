@@ -1,6 +1,7 @@
 package Service;
 
 import entity.Group;
+import exception.GroupNotFoundException;
 import manager.GroupMgr;
 
 public class GroupService {
@@ -23,6 +24,6 @@ public class GroupService {
         }
 
         group.getMemberId().add(userId);
-        return groupMgr.save(group);;
+        return groupMgr.save(group);
     }
 }
