@@ -17,11 +17,21 @@ public class BalanceMgr {
 
         balanceSheet.computeIfAbsent(userA, k -> new HashMap<>());
         Map<String, Double> userAMap = balanceSheet.get(userA);
-        userAMap.put(userB, userAMap.getOrDefault(userB, 0.0) + amount);
+        double newBalanceAB = userAMap.getOrDefault(userB, 0.0) + amount;
+        if (Math.abs(newBalanceAB) < 0.01) {
+            userAMap.remove(userB);
+        } else {
+            userAMap.put(userB, newBalanceAB);
+        }
 
         balanceSheet.computeIfAbsent(userB, k -> new HashMap<>());
         Map<String, Double> userBMap = balanceSheet.get(userB);
-        userBMap.put(userA, userBMap.getOrDefault(userA, 0.0) - amount);
+        double newBalanceBA = userBMap.getOrDefault(userA, 0.0) - amount;
+        if (Math.abs(newBalanceBA) < 0.01) {
+            userBMap.remove(userA);
+        } else {
+            userBMap.put(userA, newBalanceBA);
+        }
 
     }
 

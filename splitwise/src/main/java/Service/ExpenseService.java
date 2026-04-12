@@ -44,10 +44,30 @@ public class ExpenseService {
         }
 
         expenseMgr.save(expense);
+    }
 
+    public void settleBalance(String payerId, String payeeId, double amount) {
+        if (payerId.equals(payeeId)) {
+            throw new IllegalArgumentException("Cannot settle with yourself");
+        }
+        if (amount <= 0) {
+            throw new IllegalArgumentException("Settlement amount must be greater than 0");
+        }
 
+        Map<String, Double> payerBalances = balanceMgr.getBalancesForUser(payerId);
+        double owed = payerBalances.getOrDefault(payeeId, 0.0);
 
+        // payer owes payee → owed is negative
+        // settling more than you owe makes no sense
+        if (owed >= 0) {
+            throw new IllegalArgumentException(payerId + " does not owe " + payeeId + " anything");
+        }
+        if (amount > Math.abs(owed)) {
+            throw new IllegalArgumentException("Settlement amount " + amount + " exceeds debt of " + Math.abs(owed));
+        }
 
+        // payer pays payee → payee is owed less by payer
+        balanceMgr.update(payeeId, payerId, -amount);
 
     }
 }

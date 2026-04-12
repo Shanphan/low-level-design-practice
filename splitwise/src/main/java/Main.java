@@ -127,6 +127,55 @@ public class Main {
         } catch (Exception e) {
             System.out.println("Caught: " + e.getMessage());
         }
+
+        // --- Scenario 7: Settle Balance ---
+        // After all expenses: Alice owes Bob 100, Bob owes Charlie 320 (from scenario 3 output)
+        // Bob settles 100 with Charlie
+        System.out.println("\n=== Scenario 7: Settle Balance ===");
+        System.out.println("Before settle:");
+        printBalances(balanceMgr, "Bob", bob.getId());
+        printBalances(balanceMgr, "Charlie", charlie.getId());
+
+        // Bob owes Charlie 320 (Bob's view of Charlie is negative? Let's check)
+        // From Scenario 3: Bob balances: {Alice=-100, Charlie=320} → Charlie owes Bob 320
+        // Charlie balances: {Alice=0, Bob=-320} → Charlie owes Bob 320
+        // So Charlie settles 320 with Bob
+        System.out.println("\nCharlie settles 320 with Bob");
+        expenseService.settleBalance(charlie.getId(), bob.getId(), 320.0);
+
+        printBalances(balanceMgr, "Bob", bob.getId());
+        printBalances(balanceMgr, "Charlie", charlie.getId());
+
+        // --- Scenario 8: Settle partial ---
+        System.out.println("\n=== Scenario 8: Partial Settle ===");
+        System.out.println("Before settle:");
+        printBalances(balanceMgr, "Alice", alice.getId());
+        printBalances(balanceMgr, "Bob", bob.getId());
+
+        // Alice owes Bob 100 (Alice view of Bob = 100, meaning Bob owes Alice 100)
+        // Bob view of Alice = -100, meaning Bob owes Alice 100
+        // So Bob settles 50 with Alice
+        System.out.println("\nBob settles 50 with Alice");
+        expenseService.settleBalance(bob.getId(), alice.getId(), 50.0);
+
+        printBalances(balanceMgr, "Alice", alice.getId());
+        printBalances(balanceMgr, "Bob", bob.getId());
+
+        // --- Scenario 9: Edge case — settle with yourself ---
+        System.out.println("\n=== Scenario 9: Settle with self (should throw) ===");
+        try {
+            expenseService.settleBalance(alice.getId(), alice.getId(), 100.0);
+        } catch (Exception e) {
+            System.out.println("Caught: " + e.getMessage());
+        }
+
+        // --- Scenario 10: Edge case — settle more than owed ---
+        System.out.println("\n=== Scenario 10: Settle more than owed (should throw) ===");
+        try {
+            expenseService.settleBalance(bob.getId(), alice.getId(), 9999.0);
+        } catch (Exception e) {
+            System.out.println("Caught: " + e.getMessage());
+        }
     }
 
     private static void printBalances(BalanceMgr balanceMgr, String name, String userId) {
