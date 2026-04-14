@@ -40,5 +40,11 @@ public class BalanceMgr {
         return balanceSheet.getOrDefault(userId, new HashMap<>());
     }
 
+    public Map<String, Map<String, Double>> getBalanceSheet() {
+        return balanceSheet;
+    }
 
+    public void clear() {
+        balanceSheet.clear();
+    }
 }
