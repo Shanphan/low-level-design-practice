@@ -1,6 +1,8 @@
 package service;
 
 import entity.*;
+import exception.ClassFullException;
+import exception.DuplicateBookingException;
 import repository.BookingRepository;
 import repository.CustomerRepository;
 import repository.GymClassRepository;
@@ -30,14 +32,14 @@ public class BookingService {
         }
 
         GymClass gymClass = gymClassService.getGymClass(classId);
-
-        if (bookingRepository.isClassAlreadyBookedByUserOnDate(customerId, classId, date)) {
-            throw new RuntimeException("Already booked by " + customer.getName());
+        List<Booking> bookingsOnDay = bookingRepository.findByUserIdAndClassIdAndDate(customerId, classId, date);
+        if (!bookingsOnDay.isEmpty()) {
+            throw new DuplicateBookingException("Already booked by " + customer.getName());
         }
 
-        int count = bookingRepository.getTotalBookingsForClass(classId, date);
-        if (count >= gymClass.getMaxOccupancy()) {
-            throw new RuntimeException("Class is full");
+        List<Booking> bookings = bookingRepository.findByClassIdAndDate(classId, date);
+        if (bookings.size() >= gymClass.getMaxOccupancy()) {
+            throw new ClassFullException("Class " + gymClass.getGymId() + " is full on " + date);
         }
 
         Booking booking = new Booking(customerId, classId, LocalDateTime.now());
@@ -70,10 +72,6 @@ public class BookingService {
 
     public List<Booking> getAllCustomerBookings(String customerId) {
         return bookingRepository.getBookingByCustomerId(customerId);
-    }
-
-    public int getBookingsForClass(String classId, LocalDate date) {
-        return bookingRepository.getTotalBookingsForClass(classId, date);
     }
 
     public boolean hasConfirmedBookings(String classId) {

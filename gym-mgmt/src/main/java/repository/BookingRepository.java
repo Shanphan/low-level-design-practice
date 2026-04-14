@@ -23,21 +23,24 @@ public class BookingRepository {
     public Booking getById(String id) {
         return bookings.get(id);
     }
-    public boolean isClassAlreadyBookedByUserOnDate(String userId, String classId, LocalDate date) {
+
+    public List<Booking> findByUserIdAndClassIdAndDate(String userId, String classId, LocalDate date) {
         return bookings.values()
                 .stream()
                 .filter(b -> b.getStatus().equals(BookingStatus.CONFIRMED))
-                .anyMatch(b -> b.getCustomerId().equals(userId)
+                .filter(b -> b.getCustomerId().equals(userId)
                         && b.getGymClassId().equals(classId)
-                        && b.getBookingTime().toLocalDate().isEqual(date));
+                        && b.getBookingTime().toLocalDate().isEqual(date))
+                .toList();
     }
-    public int getTotalBookingsForClass(String classId, LocalDate date) {
-        return (int) bookings.values()
-                .stream()
+
+    // Repo — return the data
+    public List<Booking> findByClassIdAndDate(String classId, LocalDate date) {
+        return bookings.values().stream()
                 .filter(b -> b.getStatus().equals(BookingStatus.CONFIRMED))
-                .filter(b -> b.getGymClassId().equals(classId))
-                .filter(b -> b.getBookingTime().toLocalDate().isEqual(date))
-                .count();
+                .filter(b -> b.getGymClassId().equals(classId)
+                        && b.getBookingTime().toLocalDate().isEqual(date))
+                .toList();
     }
 
     public Map<String, Integer> bookingCountPerClassAndDate(LocalDate date) {
