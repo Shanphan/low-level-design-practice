@@ -1,6 +1,7 @@
 package entity;
 
 import java.time.LocalTime;
+import java.util.concurrent.locks.ReentrantLock;
 
 public class GymClass {
 
@@ -10,6 +11,7 @@ public class GymClass {
     private LocalTime startTime;
     private LocalTime endTime;
     private int maxOccupancy;
+    private final ReentrantLock lock = new ReentrantLock();
 
     public GymClass(String gymId, ClassType classType, LocalTime startTime, LocalTime endTime, int maxOccupancy) {
         this.id = EntityIdGenerator.getId("CLASS-");
@@ -62,5 +64,9 @@ public class GymClass {
 
     public void setMaxOccupancy(int maxOccupancy) {
         this.maxOccupancy = maxOccupancy;
+    }
+
+    public ReentrantLock getLock() {
+        return lock;
     }
 }

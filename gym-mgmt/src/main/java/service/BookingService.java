@@ -32,22 +32,27 @@ public class BookingService {
         }
 
         GymClass gymClass = gymClassService.getGymClass(classId);
-        List<Booking> bookingsOnDay = bookingRepository.findByUserIdAndClassIdAndDate(customerId, classId, date);
-        if (!bookingsOnDay.isEmpty()) {
-            throw new DuplicateBookingException("Already booked by " + customer.getName());
+        gymClass.getLock().lock();
+        try {
+            List<Booking> bookingsOnDay = bookingRepository.findByUserIdAndClassIdAndDate(customerId, classId, date);
+            if (!bookingsOnDay.isEmpty()) {
+                throw new DuplicateBookingException("Already booked by " + customer.getName());
+            }
+
+            List<Booking> bookings = bookingRepository.findByClassIdAndDate(classId, date);
+            if (bookings.size() >= gymClass.getMaxOccupancy()) {
+                throw new ClassFullException("Class " + gymClass.getClassType().name() + " is full on " + date);
+            }
+
+            Booking booking = new Booking(customerId, classId, LocalDateTime.now());
+            bookingRepository.saveOrUpdate(booking);
+
+            return new BookingResponse(booking.getId(), customer.getName(), gymClass.getClassType().name(),
+                    gymClass.getStartTime().toString(), gymClass.getEndTime().toString(),
+                    booking.getBookingTime().toString(), booking.getStatus().name());
+        } finally {
+            gymClass.getLock().unlock();
         }
-
-        List<Booking> bookings = bookingRepository.findByClassIdAndDate(classId, date);
-        if (bookings.size() >= gymClass.getMaxOccupancy()) {
-            throw new ClassFullException("Class " + gymClass.getGymId() + " is full on " + date);
-        }
-
-        Booking booking = new Booking(customerId, classId, LocalDateTime.now());
-        bookingRepository.saveOrUpdate(booking);
-
-        return new BookingResponse(booking.getId(), customer.getName(), gymClass.getClassType().name(),
-                gymClass.getStartTime().toString(), gymClass.getEndTime().toString(),
-                booking.getBookingTime().toString(), booking.getStatus().name());
     }
 
     public BookingResponse cancelBooking(String bookingId) {
@@ -55,19 +60,25 @@ public class BookingService {
         if (booking == null) {
             throw new RuntimeException("Booking not found: " + bookingId);
         }
-        if (booking.getStatus() == BookingStatus.CANCELLED) {
-            throw new RuntimeException("Booking already cancelled: " + bookingId);
-        }
-
-        booking.setStatus(BookingStatus.CANCELLED);
-        bookingRepository.saveOrUpdate(booking);
 
         GymClass gymClass = gymClassService.getGymClass(booking.getGymClassId());
-        Customer customer = customerRepository.getById(booking.getCustomerId());
+        gymClass.getLock().lock();
+        try {
+            if (booking.getStatus() == BookingStatus.CANCELLED) {
+                throw new RuntimeException("Booking already cancelled: " + bookingId);
+            }
 
-        return new BookingResponse(booking.getId(), customer.getName(), gymClass.getClassType().name(),
-                gymClass.getStartTime().toString(), gymClass.getEndTime().toString(),
-                booking.getBookingTime().toString(), booking.getStatus().name());
+            booking.setStatus(BookingStatus.CANCELLED);
+            bookingRepository.saveOrUpdate(booking);
+
+            Customer customer = customerRepository.getById(booking.getCustomerId());
+
+            return new BookingResponse(booking.getId(), customer.getName(), gymClass.getClassType().name(),
+                    gymClass.getStartTime().toString(), gymClass.getEndTime().toString(),
+                    booking.getBookingTime().toString(), booking.getStatus().name());
+        } finally {
+            gymClass.getLock().unlock();
+        }
     }
 
     public List<Booking> getAllCustomerBookings(String customerId) {
